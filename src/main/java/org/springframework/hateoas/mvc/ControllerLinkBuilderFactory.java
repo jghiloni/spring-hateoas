@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 the original author or authors.
+ * Copyright 2012-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.MethodParameter;
+import org.springframework.core.env.Environment;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MethodLinkBuilderFactory;
 import org.springframework.hateoas.core.AnnotationAttribute;
@@ -80,6 +81,10 @@ public class ControllerLinkBuilderFactory implements MethodLinkBuilderFactory<Co
 	public ControllerLinkBuilder linkTo(Class<?> controller) {
 		return ControllerLinkBuilder.linkTo(controller);
 	}
+	
+	public ControllerLinkBuilder linkTo(Environment env, Class<?> controller) {
+		return ControllerLinkBuilder.linkTo(env, controller);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -88,6 +93,10 @@ public class ControllerLinkBuilderFactory implements MethodLinkBuilderFactory<Co
 	@Override
 	public ControllerLinkBuilder linkTo(Class<?> controller, Object... parameters) {
 		return ControllerLinkBuilder.linkTo(controller, parameters);
+	}
+	
+	public ControllerLinkBuilder linkTo(Environment env, Class<?> controller, Object... parameters) {
+		return ControllerLinkBuilder.linkTo(env, controller, parameters);
 	}
 
 	/* 
@@ -98,6 +107,10 @@ public class ControllerLinkBuilderFactory implements MethodLinkBuilderFactory<Co
 	public ControllerLinkBuilder linkTo(Class<?> controller, Method method, Object... parameters) {
 		return ControllerLinkBuilder.linkTo(controller, method, parameters);
 	}
+	
+	public ControllerLinkBuilder linkTo(Environment env, Class<?> controller, Method method, Object... parameters) {
+		return ControllerLinkBuilder.linkTo(env, controller, method, parameters);
+	}
 
 	/* 
 	 * (non-Javadoc)
@@ -105,6 +118,10 @@ public class ControllerLinkBuilderFactory implements MethodLinkBuilderFactory<Co
 	 */
 	@Override
 	public ControllerLinkBuilder linkTo(Object invocationValue) {
+		return linkTo(null, invocationValue);
+	}
+	
+	public ControllerLinkBuilder linkTo(Environment env, Object invocationValue) {
 
 		Assert.isInstanceOf(LastInvocationAware.class, invocationValue);
 		LastInvocationAware invocations = (LastInvocationAware) invocationValue;
@@ -113,7 +130,7 @@ public class ControllerLinkBuilderFactory implements MethodLinkBuilderFactory<Co
 		Iterator<Object> classMappingParameters = invocations.getObjectParameters();
 		Method method = invocation.getMethod();
 
-		String mapping = DISCOVERER.getMapping(invocation.getTargetType(), method);
+		String mapping = ((AnnotationMappingDiscoverer)DISCOVERER).getMapping(invocation.getTargetType(), method, env);
 		UriComponentsBuilder builder = ControllerLinkBuilder.getBuilder().path(mapping);
 
 		UriTemplate template = new UriTemplate(mapping);
@@ -153,6 +170,10 @@ public class ControllerLinkBuilderFactory implements MethodLinkBuilderFactory<Co
 	@Override
 	public ControllerLinkBuilder linkTo(Method method, Object... parameters) {
 		return ControllerLinkBuilder.linkTo(method, parameters);
+	}
+	
+	public ControllerLinkBuilder linkTo(Environment env, Method method, Object... parameters) {
+		return ControllerLinkBuilder.linkTo(env, method, parameters);
 	}
 
 	/**
